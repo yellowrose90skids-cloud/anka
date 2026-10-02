@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANKA AI Assistant - Live Web Preview</title>
+  <style>
+    :root {
+      --bg: #0E0B1F;
+      --card-bg: #1B1735;
+      --accent-grad: linear-gradient(135deg, #6C4DFF 0%, #00BEFF 100%);
+      --text: #FFFFFF;
+      --text-dim: #9E9BB9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      background-color: #070510;
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .phone-container {
+      width: 380px;
+      height: 760px;
+      background: var(--bg);
+      border-radius: 40px;
+      border: 12px solid #221E3B;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 30px rgba(108,77,255,0.2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    /* Header */
+    .header {
+      padding: 20px 18px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .logo {
+      width: 34px;
+      height: 34px;
+      background: var(--accent-grad);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      color: white;
+    }
+    .header-title {
+      font-weight: 800;
+      letter-spacing: 3px;
+      font-size: 18px;
+    }
+    /* Pages */
+    .page {
+      flex: 1;
+      display: none;
+      flex-direction: column;
+      padding: 14px;
+      overflow-y: auto;
+    }
+    .page.active { display: flex; }
+    /* Model selector */
+    .selector {
+      display: flex;
+      background: #17132B;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .btn-segment {
+      flex: 1;
+      padding: 8px;
+      text-align: center;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-dim);
+      transition: all 0.2s;
+    }
+    .btn-segment.active {
+      background: var(--accent-grad);
+      color: white;
+      font-weight: 600;
+    }
+    /* Messages */
+    .messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .msg {
+      max-width: 80%;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: var(--accent-grad);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .msg.ai {
+      align-self: flex-start;
+      background: var(--card-bg);
+      color: #E2E0EE;
+      border-bottom-left-radius: 4px;
+    }
+    /* Input area */
+    .input-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      background: #17132B;
+      padding: 6px 10px;
+      border-radius: 24px;
+    }
+    .input-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: white;
+      outline: none;
+      font-size: 14px;
+    }
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .icon-btn:hover { color: white; }
+    /* Photo Page */
+    .photo-preview {
+      width: 100%;
+      height: 220px;
+      background: #17132B;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .photo-preview img { max-width: 100%; max-height: 100%; filter: brightness(var(--bri)) contrast(var(--con)) saturate(var(--sat)); transform: rotate(calc(var(--rot) * 90deg)); }
+    .slider-group { margin-bottom: 12px; }
+    .slider-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+    .slider-group input { width: 100%; accent-color: #6C4DFF; }
+    /* Settings Page */
+    .field-group { margin-bottom: 14px; }
+    .field-group label { display: block; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+    .field-group input {
+      width: 100%;
+      background: #17132B;
+      border: 1px solid rgba(255,255,255,0.1);
+      padding: 10px 12px;
+      border-radius: 10px;
+      color: white;
+      outline: none;
+    }
+    /* Bottom Navigation */
+    .nav-bar {
+      display: flex;
+      background: #130F2A;
+      padding: 10px 0;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+    .nav-item.active { color: #00BEFF; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="phone-container">
+    <div class="header">
+      <div class="logo">A</div>
+      <div class="header-title">ANKA</div>
+    </div>
+
+    <!-- Chat Tab -->
+    <div id="tab-chat" class="page active">
+      <div class="selector">
+        <div class="btn-segment active" onclick="selectModel('Gemini', this)">Gemini</div>
+        <div class="btn-segment" onclick="selectModel('OpenRouter', this)">OpenRouter</div>
+      </div>
+      <div class="messages" id="msgList">
+        <div class="msg ai">Hi! I'm ANKA, your multi-AI assistant. Ask me anything or attach a photo!</div>
+      </div>
+      <div class="input-bar">
+        <button class="icon-btn" onclick="attachPhoto()">📷</button>
+        <input type="text" id="userInput" placeholder="Ask anything..." onkeydown="if(event.key==='Enter') sendMsg()">
+        <button class="icon-btn" onclick="sendMsg()">➔</button>
+      </div>
+    </div>
+
+    <!-- Photo Tab -->
+    <div id="tab-photo" class="page">
+      <div style="text-align: center; margin-bottom: 12px;">
+        <button style="background: var(--accent-grad); border: none; color: white; padding: 10px 20px; border-radius: 20px; font-weight: 600; cursor: pointer;" onclick="attachPhoto()">Choose Photo</button>
+      </div>
+      <div class="photo-preview">
+        <img id="editImage" src="../assets/logo.png" style="--bri: 1; --con: 1; --sat: 1; --rot: 0;">
+      </div>
+      <div class="slider-group">
+        <label>Brightness</label>
+        <input type="range" min="0.5" max="1.5" step="0.05" value="1" oninput="updatePhoto('bri', this.value)">
+      </div>
+      <div class="slider-group">
+        <label>Contrast</label>
+        <input type="range" min="0.5" max="1.8" step="0.05" value="1" oninput="updatePhoto('con', this.value)">
+      </div>
+      <div class="slider-group">
+        <label>Saturation</label>
+        <input type="range" min="0" max="2" step="0.1" value="1" oninput="updatePhoto('sat', this.value)">
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div id="tab-settings" class="page">
+      <p style="font-size: 12px; color: var(--text-dim); margin-bottom: 16px;">Get free keys at aistudio.google.com and openrouter.ai.</p>
+      <div class="field-group">
+        <label>Gemini API Key</label>
+        <input type="password" placeholder="AIzaSy...">
+      </div>
+      <div class="field-group">
+        <label>Gemini Model</label>
+        <input type="text" value="gemini-2.5-flash-lite">
+      </div>
+      <div class="field-group">
+        <label>OpenRouter API Key</label>
+        <input type="password" placeholder="sk-or-v1-...">
+      </div>
+      <div class="field-group">
+        <label>OpenRouter Model</label>
+        <input type="text" value="meta-llama/llama-3.3-70b-instruct:free">
+      </div>
+    </div>
+
+    <!-- Nav Bar -->
+    <div class="nav-bar">
+      <div class="nav-item active" onclick="showTab('chat', this)">💬<br>Chat</div>
+      <div class="nav-item" onclick="showTab('photo', this)">🎨<br>Photo</div>
+      <div class="nav-item" onclick="showTab('settings', this)">⚙️<br>Settings</div>
+    </div>
+  </div>
+
+  <script>
+    let activeModel = 'Gemini';
+    function selectModel(name, el) {
+      document.querySelectorAll('.btn-segment').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      activeModel = name;
+    }
+    function showTab(name, el) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      el.classList.add('active');
+    }
+    function sendMsg() {
+      const inp = document.getElementById('userInput');
+      const text = inp.value.trim();
+      if(!text) return;
+      const list = document.getElementById('msgList');
+      list.innerHTML += `<div class="msg user">${text}</div>`;
+      inp.value = '';
+      setTimeout(() => {
+        list.innerHTML += `<div class="msg ai">[Simulated ${activeModel} Response]: I received "${text}". Add your Gemini/OpenRouter API key in Settings to connect to live AI!</div>`;
+        list.scrollTop = list.scrollHeight;
+      }, 600);
+    }
+    function attachPhoto() {
+      alert('Photo picker initialized! In live app, this opens device photo gallery.');
+    }
+    function updatePhoto(prop, val) {
+      const img = document.getElementById('editImage');
+      img.style.setProperty('--' + prop, val);
+    }
+  </script>
+</body>
+</html>
