@@ -19,6 +19,7 @@ jobs:
       - name: Build APK
         run: |
           cp lib/main.dart /tmp/main.dart
+          rm -rf android
           flutter create --org com.anka --project-name anka --platforms android .
           cp /tmp/main.dart lib/main.dart
           flutter pub add http image_picker shared_preferences
